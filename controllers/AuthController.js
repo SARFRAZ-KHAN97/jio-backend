@@ -2,11 +2,11 @@ const express = require ("express");
 const app = express();
 const jwt = require("jsonwebtoken");
 const {userModel} = require("../Models/userModel");
-const dotenv = require("dotenv");
+
+const {JWT_SECRET_KEY}= process.env;
 
 
 
-dotenv.config();
 
 const util = require("util");
 //const emailSender = require("../dynamicEmailSender");
@@ -73,8 +73,7 @@ async function loginHandler(req, res) {
                 status: "failure"
             })
         }
-        // hash the password   
-        console.log(password,user.password)
+
         const areEqual = password == user.password;
         if (!areEqual) {
             return res.status(400).json({
@@ -84,7 +83,7 @@ async function loginHandler(req, res) {
         }
 
         // token create
-        const authToken = await promisifiedJWTsign({ id: user["_id"] }, process.env.JWT_SECRET_KEY);
+        const authToken = await promisifiedJWTsign({ id: user["_id"] }, JWT_SECRET_KEY);
         // // token -> cookies
         res.cookie("jwt", authToken, {
             maxAge: 1000 * 60 * 60 * 24,
@@ -112,7 +111,6 @@ async function loginHandler(req, res) {
 const protectedRouteMiddleware = async function (req, res, next) {
     try {
         let jwttoken = req.cookies.jwt;
-        console.log(jwttoken);
         if (!jwttoken) {
             return res.status(401).json({
                 message: "unauthorized",
@@ -120,7 +118,7 @@ const protectedRouteMiddleware = async function (req, res, next) {
             })
         };
 
-        let decryptedToken = await promisifiedJWTverify(jwttoken, process.env.JWT_SECRET_KEY);
+        let decryptedToken = await promisifiedJWTverify(jwttoken, JWT_SECRET_KEY);
 
         if (decryptedToken) {
             let userId = decryptedToken.id;
