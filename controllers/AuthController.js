@@ -113,7 +113,8 @@ async function loginHandler(req, res) {
 
 async function protectedRouteMiddleware(req, res, next) {
     try{
-        const token = req.cookies._vercel_jwt;
+        const token = req.cookies.jwt;
+        console.log(token);
         if(!token) {
             return res.status(401).json({
                 message: "unauthorized access",
