@@ -109,7 +109,7 @@ async function loginHandler(req, res) {
     }
 }
 
-const protectedRouteMiddleWare = async function (req, res, next) {
+const protectedRouteMiddleware = async function (req, res, next) {
     try {
         let jwttoken = req.cookies.jwt;
         if (!jwttoken) {
@@ -317,5 +317,5 @@ async function resetPasswordHandler(req, res) {
 
 
 module.exports = {
-    signUpHandler, loginHandler, protectedRouteMiddleWare, profileHandler, logoutHandler, isAdminMiddleware, forgetPasswordHandler, resetPasswordHandler
+    signUpHandler, loginHandler, protectedRouteMiddleware, profileHandler, logoutHandler, isAdminMiddleware, forgetPasswordHandler, resetPasswordHandler
 }
