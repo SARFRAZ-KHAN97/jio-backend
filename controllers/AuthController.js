@@ -63,6 +63,7 @@ async function signUpHandler(req, res) {
 async function loginHandler(req, res) {
    
     try{
+        
         const {email, password} = req.body;
         const user = await userModel.findOne({email});
         if(!user) {
@@ -112,7 +113,7 @@ async function loginHandler(req, res) {
 
 async function protectedRouteMiddleware(req, res, next) {
     try{
-        const token = req.cookies.jwt;
+        const token = req.cookies._vercel_jwt;
         if(!token) {
             return res.status(401).json({
                 message: "unauthorized access",

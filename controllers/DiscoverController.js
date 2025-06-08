@@ -24,6 +24,7 @@ const getNowPlaying= async (req, res) => {
 
 const getTrending= async (req, res) => {
     try {
+        console.log(process.env.TMDB_KEY)
         const data= await tmdbApi.get(TMDB_ENDPOINT.fetchTrending);
         
         res.status(200).json({

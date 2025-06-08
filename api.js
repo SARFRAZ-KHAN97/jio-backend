@@ -4,6 +4,7 @@ const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const cors= require("cors");
+const morgan= require("morgan");
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ mongoose.connect(dbLink)
 
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(morgan("dev"));
 
 const corsConfig = {
     origin: true,
@@ -39,6 +40,7 @@ const discoverRouter= require("./Routers/DiscoverRouter.js");
 const userRouter = require("./Routers/UserRouter.js");
 const videoRouter= require("./Routers/VideoRouter.js");
 const tvShowsRouter= require("./Routers/TvRouter.js");
+
 
 
 
