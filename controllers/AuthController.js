@@ -89,6 +89,7 @@ async function loginHandler(req, res) {
             maxAge: 1000 * 60 * 60 * 24,
             secure:true,
             httpOnly: true, // it can only be accessed by the server
+            sameSite: "none"
         })
         // // res send 
         res.status(200).json({
