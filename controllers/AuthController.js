@@ -66,7 +66,7 @@ async function loginHandler(req, res) {
     try {
 
         const { email, password } = req.body;
-        const user = await UserModel.findOne({ email });
+        const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(404).json({
                 message: "Invalid email or password",
@@ -112,7 +112,12 @@ async function loginHandler(req, res) {
 const protectedRouteMiddleWare = async function (req, res, next) {
     try {
         let jwttoken = req.cookies.jwt;
-        if (!jwttoken) throw new Error("UnAuthorized!");
+        if (!jwttoken) {
+            return res.status(401).json({
+                message: "unauthorized",
+                status: "failure"
+            })
+        };
 
         let decryptedToken = await promisifiedJWTverify(jwttoken, JWT_SECRET_KEY);
 
