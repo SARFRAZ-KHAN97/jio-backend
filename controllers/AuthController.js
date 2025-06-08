@@ -82,7 +82,7 @@ async function loginHandler(req, res) {
 
         const authToken = await promisifiedJWTsign({id: user["_id"]}, process.env.JWT_SECRET_KEY, {algorithm: "HS256"}); //algo is by default selected same so can be skipped
         
-        res.cookie("jwt", authToken, {
+        res.cookie("custom_jwt", authToken, {
             maxAge: 1000*60*60*24,
             httpOnly: true, 
             secure: true
@@ -113,7 +113,7 @@ async function loginHandler(req, res) {
 
 async function protectedRouteMiddleware(req, res, next) {
     try{
-        const token = req.cookies.jwt;
+        const token = req.cookies.custom_jwt;
         console.log(token);
         if(!token) {
             return res.status(401).json({
@@ -163,7 +163,7 @@ async function profileHandler(req, res) {
 
 function logoutHandler(req, res) {
     try{
-        res.clearCookie('jwt', {
+        res.clearCookie('custom_jwt', {
             path: '/',
             httpOnly: true,
             secure: true
