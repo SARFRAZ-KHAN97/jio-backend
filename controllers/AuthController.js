@@ -61,77 +61,75 @@ async function signUpHandler(req, res) {
 
 
 async function loginHandler(req, res) {
-   
-    try{
-        
-        const {email, password} = req.body;
-        const user = await userModel.findOne({email});
-        if(!user) {
+    // email,password -> if exist -> allow login 
+    //  cookies -> JWT -> they will bring back the token -> protected Route
+    try {
+
+        const { email, password } = req.body;
+        const user = await UserModel.findOne({ email });
+        if (!user) {
             return res.status(404).json({
                 message: "Invalid email or password",
                 status: "failure"
             })
         }
-        const areEqual = password==user.password;
-        if(!areEqual) {
-            return res.status(404).json({
+        // hash the password   
+        console.log(password,user.password)
+        const areEqual = password == user.password;
+        if (!areEqual) {
+            return res.status(400).json({
                 message: "Invalid email or password",
                 status: "failure"
             })
         }
 
-        const authToken = await promisifiedJWTsign({id: user["_id"]}, process.env.JWT_SECRET_KEY, {algorithm: "HS256"}); //algo is by default selected same so can be skipped
-        
-        res.cookie("custom_jwt", authToken, {
-            maxAge: 1000*60*60*24,
-            httpOnly: true, 
-            secure: true
+        // token create
+        const authToken = await promisifiedJWTsign({ id: user["_id"] }, process.env.JWT_SECRET_KEY);
+        // // token -> cookies
+        res.cookie("jwt", authToken, {
+            maxAge: 1000 * 60 * 60 * 24,
+            secure:true,
+            httpOnly: true, // it can only be accessed by the server
         })
+        // // res send 
         res.status(200).json({
-            message: "login successfull",
+            message: "login successfully",
             status: "success",
             user: user
         })
-        
-
-    }
-    catch (err) {
-        if (err.name === "ValidationError") {
-        return res.status(400).json({
-            message: err.message, 
-            status: "failure"
-        });
-    }
-
-    res.status(500).json({
-        message: "Internal Server Error",
-        status: "failed"
-    });
-    }
-}
 
 
-async function protectedRouteMiddleware(req, res, next) {
-    try{
-        const token = req.cookies.custom_jwt;
-        console.log(token);
-        if(!token) {
-            return res.status(401).json({
-                message: "unauthorized access",
-                status: "failure"
-            })
-        }
-        const unlockedToken = await promisifiedJWTverify(token, process.env.JWT_SECRET_KEY);    //unlockedToken has payload i.e id which can be use track user of the cookie 
-        req.id= unlockedToken.id; 
-        next();
-    }
-    catch (err) {
+
+    } catch (err) {
+        console.log("err", err);
         res.status(500).json({
-            message: "internal server error",
+            message: err.message,
             status: "failure"
         })
     }
 }
+
+const protectRouteMiddleWare = async function (req, res, next) {
+    try {
+        let jwttoken = req.cookies.jwt;
+        if (!jwttoken) throw new Error("UnAuthorized!");
+
+        let decryptedToken = await promisifiedJWTverify(jwttoken, JWT_SECRET_KEY);
+
+        if (decryptedToken) {
+            let userId = decryptedToken.id;
+            // adding the userId to the req object
+            req.userId = userId;
+            console.log("authenticated");
+            next();
+        }
+    } catch (err) {
+        res.status(500).json({
+            message: err.message,
+            status: "failure",
+        });
+    }
+};
 
 
 async function profileHandler(req, res) {
