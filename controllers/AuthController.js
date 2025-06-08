@@ -112,6 +112,7 @@ async function loginHandler(req, res) {
 const protectedRouteMiddleware = async function (req, res, next) {
     try {
         let jwttoken = req.cookies.jwt;
+        console.log(jwttoken);
         if (!jwttoken) {
             return res.status(401).json({
                 message: "unauthorized",
@@ -119,7 +120,7 @@ const protectedRouteMiddleware = async function (req, res, next) {
             })
         };
 
-        let decryptedToken = await promisifiedJWTverify(jwttoken, JWT_SECRET_KEY);
+        let decryptedToken = await promisifiedJWTverify(jwttoken, process.env.JWT_SECRET_KEY);
 
         if (decryptedToken) {
             let userId = decryptedToken.id;
