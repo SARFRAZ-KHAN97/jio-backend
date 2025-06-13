@@ -60,7 +60,7 @@ const addToWishlist= async (req, res) => {
             })
         }
 
-        if(user.wishlist.includes(id)) {
+        if(user.wishlist.some(item => item.id === id)) {
             return res.status(400).json({
                 message: "product already in wishlist",
                 status: "failure"
